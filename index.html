@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+
+<meta charset="UTF-8">
+<title>연애상담 챗봇</title>
+
+<style>
+
+body{
+    background:#ffeef5;
+    font-family:Arial;
+}
+
+.container{
+
+width:500px;
+margin:30px auto;
+background:white;
+padding:20px;
+border-radius:15px;
+box-shadow:0 0 10px gray;
+
+}
+
+.chat{
+
+height:450px;
+overflow-y:auto;
+border:1px solid #ddd;
+padding:10px;
+margin-bottom:15px;
+
+}
+
+.user{
+
+text-align:right;
+margin:10px;
+
+}
+
+.bot{
+
+text-align:left;
+margin:10px;
+
+}
+
+input{
+
+width:80%;
+padding:10px;
+
+}
+
+button{
+
+padding:10px;
+
+}
+
+</style>
+
+</head>
+
+<body>
+
+<div class="container">
+
+<h2>💕 연애상담 챗봇</h2>
+
+<div class="chat" id="chat"></div>
+
+<input id="question">
+
+<button onclick="send()">전송</button>
+
+</div>
+
+<script>
+
+let data=[];
+
+// CSV 읽기
+fetch("love_chat.csv")
+
+.then(res=>res.text())
+
+.then(text=>{
+
+const rows=text.trim().split("\n");
+
+rows.shift();
+
+rows.forEach(r=>{
+
+const col=r.split(",");
+
+data.push({
+
+question:col[0],
+
+answer:col.slice(1).join(",").replace(/"/g,"")
+
+});
+
+});
+
+});
+
+function addChat(msg,type){
+
+const chat=document.getElementById("chat");
+
+chat.innerHTML+=`<div class="${type}"><b>${type=="user"?"나":"챗봇"} :</b> ${msg}</div>`;
+
+chat.scrollTop=chat.scrollHeight;
+
+}
+
+function send(){
+
+let q=document.getElementById("question").value;
+
+if(q=="") return;
+
+addChat(q,"user");
+
+document.getElementById("question").value="";
+
+let found=false;
+
+for(let i=0;i<data.length;i++){
+
+if(q.includes(data[i].question) || data[i].question.includes(q)){
+
+addChat(data[i].answer,"bot");
+
+found=true;
+
+break;
+
+}
+
+}
+
+if(!found){
+
+addChat("죄송해요. 아직 학습되지 않은 질문이에요.", "bot");
+
+}
+
+}
+
+</script>
+
+</body>
+
+</html>
